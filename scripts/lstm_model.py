@@ -11,9 +11,17 @@ from sklearn.preprocessing import LabelEncoder
 
 # Function to combine the 3 sequence columns into a tensor for the LSTM model
 def prepare_lstm_data(df):
+    #Only filter rows where all sequences have length 30
+    valid_idx = df.apply(lambda row: 
+                         len(row['logins_seq']) == 30 and 
+                         len(row['support_seq']) == 30 and 
+                         len(row['data_seq']) == 30, axis=1)
+    
+    df = df[valid_idx].reset_index(drop=True)
+    
     # n_samples = number of customers, 30 timesteps, 3 features
     n_samples = len(df)
-    n_timesteps = len(df.iloc[0]['logins_seq'])
+    n_timesteps = 30
 
     # Preallocate array
     sequences = np.zeros((n_samples, n_timesteps, 3))
