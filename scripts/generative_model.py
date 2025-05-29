@@ -7,7 +7,7 @@ def fit_and_simulate(df, seed=42):
     # Encode churn as 0/1
     churn_flag = df['Churn'].map({'No': 0, 'Yes': 1}).astype(int)
 
-    # Dummy observed values (can be replaced with real)
+    # Dummy observed values
     df['logins'] = np.where(churn_flag == 1, np.random.poisson(3, size=len(df)), np.random.poisson(6, size=len(df)))
     df['support_contacts'] = np.where(churn_flag == 1, np.random.binomial(n=30, p=0.05, size=len(df)), np.random.binomial(n=30, p=0.02, size=len(df)))
     df['data_usage_gb'] = np.where(churn_flag == 1, np.random.gamma(2, 1.2, size=len(df)), np.random.gamma(2.5, 1.6, size=len(df)))
@@ -25,7 +25,7 @@ def fit_and_simulate(df, seed=42):
         p_support = pm.math.switch(churn_flag, p_churn, p_nochurn)
         support_obs = pm.Binomial("support_obs", n=30, p=p_support, observed=df['support_contacts'])
 
-        # DATA USAGE
+        # DATA USAGE IN GB
         shape_churn = pm.Gamma("shape_churn", alpha=2, beta=1)
         scale_churn = pm.Gamma("scale_churn", alpha=2, beta=1)
         shape_nochurn = pm.Gamma("shape_nochurn", alpha=2, beta=1)
@@ -47,17 +47,24 @@ def fit_and_simulate(df, seed=42):
     shape_nochurn_sample = np.random.choice(trace.posterior['shape_nochurn'].values.flatten())
     scale_nochurn_sample = np.random.choice(trace.posterior['scale_nochurn'].values.flatten())
 
-    # Simulate new behavior
-    df['sim_logins'] = np.where(churn_flag == 1,
-                                np.random.poisson(lambda_churn_sample, size=len(df)),
-                                np.random.poisson(lambda_nochurn_sample, size=len(df)))
+    # Simulate 30-day sequences based on churn
+    logins = []
+    support = []
+    data_usage = []
 
-    df['sim_support_contacts'] = np.where(churn_flag == 1,
-                                          np.random.binomial(n=30, p=p_churn_sample, size=len(df)),
-                                          np.random.binomial(n=30, p=p_nochurn_sample, size=len(df)))
+    for is_churn in churn_flag:
+        if is_churn:
+            logins.append(np.random.poisson(lambda_churn_sample, size=30).tolist())
+            support.append(np.random.binomial(n=1, p=p_churn_sample, size=30).tolist())
+            data_usage.append(np.random.gamma(shape_churn_sample, scale_churn_sample, size=30).tolist())
+        else:
+            logins.append(np.random.poisson(lambda_nochurn_sample, size=30).tolist())
+            support.append(np.random.binomial(n=1, p=p_nochurn_sample, size=30).tolist())
+            data_usage.append(np.random.gamma(shape_nochurn_sample, scale_nochurn_sample, size=30).tolist())
 
-    df['sim_data_usage_gb'] = np.where(churn_flag == 1,
-                                       np.random.gamma(shape_churn_sample, scale_churn_sample, size=len(df)),
-                                       np.random.gamma(shape_nochurn_sample, scale_nochurn_sample, size=len(df)))
+    # Store sequences as list-columns in dataframe
+    df['logins_seq'] = logins
+    df['support_seq'] = support
+    df['data_seq'] = data_usage
 
     return df[['customerID', 'Churn', 'sim_logins', 'sim_support_contacts', 'sim_data_usage_gb']]
