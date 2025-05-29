@@ -52,19 +52,20 @@ def fit_and_simulate(df, seed=42):
     support = []
     data_usage = []
 
+    
     for is_churn in churn_flag:
-        if is_churn:
-            logins.append(np.random.poisson(lambda_churn_sample, size=30).tolist())
+        if is_churn: #If customer churns
+            logins.append(np.random.poisson(lambda_churn_sample, size=30).tolist()) 
             support.append(np.random.binomial(n=1, p=p_churn_sample, size=30).tolist())
             data_usage.append(np.random.gamma(shape_churn_sample, scale_churn_sample, size=30).tolist())
-        else:
+        else: #If customer dont churn
             logins.append(np.random.poisson(lambda_nochurn_sample, size=30).tolist())
             support.append(np.random.binomial(n=1, p=p_nochurn_sample, size=30).tolist())
             data_usage.append(np.random.gamma(shape_nochurn_sample, scale_nochurn_sample, size=30).tolist())
 
-    # Store sequences as list-columns in dataframe
+    # Store sequences as list columns in dataframe
     df['logins_seq'] = logins
     df['support_seq'] = support
     df['data_seq'] = data_usage
 
-    return df[['customerID', 'Churn', 'sim_logins', 'sim_support_contacts', 'sim_data_usage_gb']]
+    return df[['customerID', 'Churn', 'logins_seq', 'support_seq', 'data_seq']]
