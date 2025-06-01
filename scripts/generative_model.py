@@ -14,22 +14,22 @@ def fit_and_simulate(df, seed=42):
 
     with pm.Model() as model:
         # LOGINS
-        lambda_churn = pm.Exponential("lambda_churn", lam=1.2)
-        lambda_nochurn = pm.Exponential("lambda_nochurn", lam=1)
+        lambda_churn = pm.Exponential("lambda_churn", lam=1.1)
+        lambda_nochurn = pm.Exponential("lambda_nochurn", lam=1.05)
         lambda_logins = pm.math.switch(churn_flag, lambda_churn, lambda_nochurn)
         logins_obs = pm.Poisson("logins_obs", mu=lambda_logins, observed=df['logins'])
 
         # SUPPORT CONTACTS
-        p_churn = pm.Beta("p_churn", alpha=2, beta=40)
-        p_nochurn = pm.Beta("p_nochurn", alpha=2, beta=50)
+        p_churn = pm.Beta("p_churn", alpha=2, beta=42)
+        p_nochurn = pm.Beta("p_nochurn", alpha=2, beta=46)
         p_support = pm.math.switch(churn_flag, p_churn, p_nochurn)
         support_obs = pm.Binomial("support_obs", n=30, p=p_support, observed=df['support_contacts'])
 
         # DATA USAGE IN GB
-        shape_churn = pm.Gamma("shape_churn", alpha=2, beta=1.2)
+        shape_churn = pm.Gamma("shape_churn", alpha=2, beta=1.3)
         scale_churn = pm.Gamma("scale_churn", alpha=2, beta=1.5)
-        shape_nochurn = pm.Gamma("shape_nochurn", alpha=2, beta=1.1)
-        scale_nochurn = pm.Gamma("scale_nochurn", alpha=2, beta=1.3)
+        shape_nochurn = pm.Gamma("shape_nochurn", alpha=2, beta=1.25)
+        scale_nochurn = pm.Gamma("scale_nochurn", alpha=2, beta=1.4)
 
         shape = pm.math.switch(churn_flag, shape_churn, shape_nochurn)
         scale = pm.math.switch(churn_flag, scale_churn, scale_nochurn)
