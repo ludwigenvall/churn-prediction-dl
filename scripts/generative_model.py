@@ -1,7 +1,7 @@
 import numpy as np
 import pymc as pm
 
-def fit_and_simulate(df, seed=42):
+def fit_and_simulate(df, seed=45):
     np.random.seed(seed)
 
     # Encode churn as 0/1
