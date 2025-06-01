@@ -3,7 +3,7 @@
 #Importing library
 import numpy as np
 import tensorflow as tf
-import ast # to convert stringlists to pyhon lists
+
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 from sklearn.model_selection import train_test_split
@@ -12,10 +12,10 @@ from sklearn.preprocessing import LabelEncoder
 
 # Function to combine the 3 sequence columns into a tensor
 def prepare_lstm_data(df):
-    # Convert stringified lists to actual lists of floats/ints
-    df['logins_seq'] = df['logins_seq'].apply(lambda x: list(map(int, ast.literal_eval(f"[{x}]"))) if isinstance(x, str) else x)
-    df['support_seq'] = df['support_seq'].apply(lambda x: list(map(int, ast.literal_eval(f"[{x}]"))) if isinstance(x, str) else x)
-    df['data_seq'] = df['data_seq'].apply(lambda x: list(map(float, ast.literal_eval(f"[{x}]"))) if isinstance(x, str) else x)
+    df['logins_seq'] = df['logins_seq'].apply(lambda x: list(map(int, x.split(','))) if isinstance(x, str) else x)
+    df['support_seq'] = df['support_seq'].apply(lambda x: list(map(int, x.split(','))) if isinstance(x, str) else x)
+    df['data_seq'] = df['data_seq'].apply(lambda x: list(map(float, x.split(','))) if isinstance(x, str) else x)
+
 
     sequences = np.stack([
         df['logins_seq'].to_list(),
