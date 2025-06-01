@@ -3,13 +3,14 @@
 #Importing library
 import numpy as np
 import tensorflow as tf
+import ast # to convert stringlists to pyhon lists
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 
-# Function to combine the 3 sequence columns into a tensor for the LSTM model
+# Function to combine the 3 sequence columns into a tensor
 def prepare_lstm_data(df):
     # Convert stringified lists to actual lists of floats/ints
     df['logins_seq'] = df['logins_seq'].apply(lambda x: list(map(int, ast.literal_eval(f"[{x}]"))) if isinstance(x, str) else x)
@@ -20,7 +21,7 @@ def prepare_lstm_data(df):
         df['logins_seq'].to_list(),
         df['support_seq'].to_list(),
         df['data_seq'].to_list()
-    ], axis=1).transpose(1, 2, 0)  # Dimension fix
+    ], axis=-1)
     # Encodes "Churn" as 0=No, 1=Yes
     le = LabelEncoder()
     labels = le.fit_transform(df['Churn'])
