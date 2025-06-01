@@ -37,15 +37,19 @@ def fit_and_simulate(df, seed=42):
 
         trace = pm.sample(1000, tune=1000, target_accept=0.9, random_seed=seed)
 
-    # Draw posterior samples
-    lambda_churn_sample = np.random.choice(trace.posterior['lambda_churn'].values.flatten())
-    lambda_nochurn_sample = np.random.choice(trace.posterior['lambda_nochurn'].values.flatten())
-    p_churn_sample = np.random.choice(trace.posterior['p_churn'].values.flatten())
-    p_nochurn_sample = np.random.choice(trace.posterior['p_nochurn'].values.flatten())
-    shape_churn_sample = np.random.choice(trace.posterior['shape_churn'].values.flatten())
-    scale_churn_sample = np.random.choice(trace.posterior['scale_churn'].values.flatten())
-    shape_nochurn_sample = np.random.choice(trace.posterior['shape_nochurn'].values.flatten())
-    scale_nochurn_sample = np.random.choice(trace.posterior['scale_nochurn'].values.flatten())
+    # Draw posterior samples with noise
+    lambda_churn_sample = np.random.choice(trace.posterior['lambda_churn'].values.flatten()) + np.random.normal(0, 0.05)
+    lambda_nochurn_sample = np.random.choice(trace.posterior['lambda_nochurn'].values.flatten()) + np.random.normal(0, 0.05)
+
+    p_churn_sample = np.clip(np.random.choice(trace.posterior['p_churn'].values.flatten()) + np.random.normal(0, 0.01), 0, 1)
+    p_nochurn_sample = np.clip(np.random.choice(trace.posterior['p_nochurn'].values.flatten()) + np.random.normal(0, 0.01), 0, 1)
+
+    shape_churn_sample = np.random.choice(trace.posterior['shape_churn'].values.flatten()) + np.random.normal(0, 0.1)
+    scale_churn_sample = np.random.choice(trace.posterior['scale_churn'].values.flatten()) + np.random.normal(0, 0.1)
+
+    shape_nochurn_sample = np.random.choice(trace.posterior['shape_nochurn'].values.flatten()) + np.random.normal(0, 0.1)
+    scale_nochurn_sample = np.random.choice(trace.posterior['scale_nochurn'].values.flatten()) + np.random.normal(0, 0.1)
+
 
     # Simulate 30-day sequences based on churn
     logins = []
