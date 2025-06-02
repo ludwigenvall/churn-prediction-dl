@@ -4,8 +4,7 @@ This project simulates customer behavior using a Bayesian generative model and p
 
 ## Project structure
 
-- `simulate_data.py`: Generates time series data for customer activity.
-- `model.py`: Trains an LSTM model to predict churn.
+- `scripts/`: Python scripts for the generative model and training LSTM model.
 - `notebooks/`: Jupyter notebooks for testing and exploration.
 - `results/`: Figures and evaluation results.
 
