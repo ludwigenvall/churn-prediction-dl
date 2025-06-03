@@ -50,7 +50,7 @@ def compile_lstm_model(model):
 
 
 # Function for hyperparameter-tuning
-def build_model(hp):
+def tuning_model(hp):
     model = Sequential()
     model.add(LSTM(
         units=hp.Int('lstm_units_1', min_value=32, max_value=128, step=16),
