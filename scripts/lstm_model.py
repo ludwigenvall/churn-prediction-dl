@@ -9,7 +9,7 @@ from tensorflow.keras.layers import LSTM, Dense, Dropout, TimeDistributed
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.regularizers import l2
-
+from tensorflow.keras.optimizers import Adam
 
 # Function to combine the 3 sequence columns into a tensor
 def prepare_lstm_data(df):
