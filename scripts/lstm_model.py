@@ -5,11 +5,9 @@ import numpy as np
 import tensorflow as tf
 import ast
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout, TimeDistributed
+from tensorflow.keras.layers import LSTM, Dense, Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from tensorflow.keras.regularizers import l2
-from tensorflow.keras.optimizers import Adam
 
 # Function to combine the 3 sequence columns into a tensor
 def prepare_lstm_data(df):
@@ -48,35 +46,3 @@ def build_lstm_model(input_shape):
 def compile_lstm_model(model):
    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
    return model
-
-
-# Function for hyperparameter-tuning
-def tuning_model(hp):
-    model = Sequential()
-    model.add(LSTM(
-        units=hp.Int('lstm_units_1', min_value=32, max_value=128, step=16),
-        return_sequences=True,
-        input_shape=(30, 3)
-    ))
-    model.add(TimeDistributed(Dense(
-        units=hp.Int('td_dense_1', min_value=32, max_value=128, step=16),
-        activation='relu',
-        kernel_regularizer=l2(hp.Float('l2_1', 1e-4, 1e-2, sampling='log'))
-    )))
-    model.add(TimeDistributed(Dense(
-        units=hp.Int('td_dense_2', min_value=16, max_value=64, step=16),
-        activation='relu',
-        kernel_regularizer=l2(hp.Float('l2_2', 1e-4, 1e-2, sampling='log'))
-    )))
-    model.add(LSTM(
-        units=hp.Int('lstm_units_2', min_value=16, max_value=64, step=16)
-    ))
-    model.add(Dropout(hp.Float('dropout', 0.2, 0.5, step=0.1)))
-    model.add(Dense(1, activation='sigmoid'))
-
-    model.compile(
-        optimizer=Adam(learning_rate=hp.Float('lr', 1e-4, 1e-2, sampling='log')),
-        loss='binary_crossentropy',
-        metrics=['accuracy']
-    )
-    return model
