@@ -47,3 +47,35 @@ def build_lstm_model(input_shape):
 def compile_lstm_model(model):
    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
    return model
+
+
+# Function for hyperparameter-tuning
+def build_model(hp):
+    model = Sequential()
+    model.add(LSTM(
+        units=hp.Int('lstm_units_1', min_value=32, max_value=128, step=16),
+        return_sequences=True,
+        input_shape=(30, 3)
+    ))
+    model.add(TimeDistributed(Dense(
+        units=hp.Int('td_dense_1', min_value=32, max_value=128, step=16),
+        activation='relu',
+        kernel_regularizer=l2(hp.Float('l2_1', 1e-4, 1e-2, sampling='log'))
+    )))
+    model.add(TimeDistributed(Dense(
+        units=hp.Int('td_dense_2', min_value=16, max_value=64, step=16),
+        activation='relu',
+        kernel_regularizer=l2(hp.Float('l2_2', 1e-4, 1e-2, sampling='log'))
+    )))
+    model.add(LSTM(
+        units=hp.Int('lstm_units_2', min_value=16, max_value=64, step=16)
+    ))
+    model.add(Dropout(hp.Float('dropout', 0.2, 0.5, step=0.1)))
+    model.add(Dense(1, activation='sigmoid'))
+
+    model.compile(
+        optimizer=Adam(learning_rate=hp.Float('lr', 1e-4, 1e-2, sampling='log')),
+        loss='binary_crossentropy',
+        metrics=['accuracy']
+    )
+    return model
