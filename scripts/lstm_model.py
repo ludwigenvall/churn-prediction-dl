@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 import ast
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout
+from tensorflow.keras.layers import LSTM, Dense, Dropout, TimeDistributed
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
