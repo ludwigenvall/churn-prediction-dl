@@ -8,6 +8,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, TimeDistributed
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from tensorflow.keras.regularizers import l2
 
 
 # Function to combine the 3 sequence columns into a tensor
